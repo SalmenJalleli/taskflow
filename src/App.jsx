@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import "./App.css";
 
@@ -26,7 +25,14 @@ const sampleTasks = [
     completed: true,
   },
 ];
-
+//Task to add
+let taskToAdd = {
+  id: 4,
+  title: "Add a new task",
+  description: "Implement the add task feature",
+  priority: "medium",
+  completed: false,
+};
 function App() {
   // STATE: App owns the tasks state
   const [tasks, setTasks] = useState(sampleTasks);
@@ -35,28 +41,25 @@ function App() {
   function toggleTask(id) {
     setTasks((currentTasks) =>
       currentTasks.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task
-      )
+        task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
     );
   }
 
   // Delete a task
   function deleteTask(id) {
-    setTasks((currentTasks) =>
-      currentTasks.filter((task) => task.id !== id)
-    );
+    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
+  }
+
+  // Add a new task
+  function addTask(newTask) {
+    setTasks((currentTasks) => [newTask, ...currentTasks]);
   }
 
   // Derived state: calculate task statistics
-  const completedTasksCount = tasks.filter(
-    (task) => task.completed
-  ).length;
+  const completedTasksCount = tasks.filter((task) => task.completed).length;
 
-  const activeCount = tasks.filter(
-    (task) => !task.completed
-  ).length;
+  const activeCount = tasks.filter((task) => !task.completed).length;
 
   return (
     <main>
@@ -68,13 +71,9 @@ function App() {
       />
 
       <Panel title="Your Tasks">
-        <TaskList
-          tasks={tasks}
-          onToggle={toggleTask}
-          onDelete={deleteTask}
-        />
+        <TaskList tasks={tasks} onToggle={toggleTask} onDelete={deleteTask} />
       </Panel>
-
+      <TaskForm onAddTask={addTask} />
       <Counter />
     </main>
   );
@@ -95,9 +94,7 @@ function SummaryCard({ completedTasksCount, activeCount }) {
   return (
     <div className="summary-card">
       <h2>Summary</h2>
-      <p>
-        Welcome to TaskFlow! See your tasks and progress at a glance.
-      </p>
+      <p>Welcome to TaskFlow! See your tasks and progress at a glance.</p>
       <p>Total completed tasks: {completedTasksCount}</p>
       <p>Total active tasks: {activeCount}</p>
     </div>
@@ -116,17 +113,11 @@ function TaskCard({ task, onToggleComplete, onDeleteTask }) {
 
       <p>Status: {task.completed ? "Completed" : "Active"}</p>
 
-      <button
-        type="button"
-        onClick={() => onToggleComplete(task.id)}
-      >
+      <button type="button" onClick={() => onToggleComplete(task.id)}>
         {task.completed ? "Mark Incomplete" : "Mark Complete"}
       </button>
 
-      <button
-        type="button"
-        onClick={() => onDeleteTask(task.id)}
-      >
+      <button type="button" onClick={() => onDeleteTask(task.id)}>
         Delete
       </button>
     </article>
@@ -190,4 +181,57 @@ function Counter() {
   );
 }
 
+function TaskForm({ onAddTask }) {
+  const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState("medium");
+  const [error, setError] = useState("");
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!title) {
+      setError("Title is required");
+      return;
+    }
+    const cleanTitle = title.trim();
+    if (!cleanTitle) {
+      setError("Title cannot be empty");
+      return;
+    }
+    onAddTask({
+      id: crypto.randomUUID(),
+      title: cleanTitle,
+      description: "",
+      priority,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    });
+    setTitle("");
+    setPriority("medium");
+    setError("");
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="title">Title:</label>
+      <input
+        type="text"
+        id="title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        maxLength={80}
+      />
+      <label htmlFor="priority">Priority:</label>
+      <select
+        id="priority"
+        value={priority}
+        onChange={(e) => setPriority(e.target.value)}
+      >
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      {error && <p role="alert">{error}</p>}
+      <button type="submit">Add Task</button>
+    </form>
+  );
+}
 export default App;
