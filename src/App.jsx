@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import useLocalStorageState from "./hooks/useLocalStorageState.jsx";
 import "./App.css";
 
 // Initial task data
@@ -35,7 +36,7 @@ let taskToAdd = {
 };
 function App() {
   // STATE: App owns the tasks state
-  const [tasks, setTasks] = useState(sampleTasks);
+  const [tasks, setTasks] = useLocalStorageState("tasks", []);
 
   // Toggle task completion
   function toggleTask(id) {
