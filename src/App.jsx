@@ -1,11 +1,12 @@
 import useLocalStorageState from "./hooks/useLocalStorageState.jsx";
-import useTaskFilters from "./hooks/useTaskFilters.jsx"
+import useTaskFilters from "./hooks/useTaskFilters.jsx";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link } from "react-router";
 import TaskDetailPage from "./components/TaskDetailPage.jsx";
 import HomePage from "./components/HomePage.jsx";
 import NotFoundPage from "./components/NotFoundpage.jsx";
 import CompA from "./components/CompA.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
 
 // Initial task data
 const sampleTasks = [
@@ -68,28 +69,30 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                tasks={tasks}
-                onToggle={toggleTask}
-                onDelete={deleteTask}
-                onAddTask={addTask}
-                completedTasksCount={completedTasksCount}
-                activeCount={activeCount}
-              />
-            }
-          />
-          <Route
-            path="/tasks/:taskId"
-            element={<TaskDetailPage tasks={tasks} />}
-          />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  tasks={tasks}
+                  onToggle={toggleTask}
+                  onDelete={deleteTask}
+                  onAddTask={addTask}
+                  completedTasksCount={completedTasksCount}
+                  activeCount={activeCount}
+                />
+              }
+            />
+            <Route
+              path="/tasks/:taskId"
+              element={<TaskDetailPage tasks={tasks} />}
+            />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
       <CompA />
     </>
   );
