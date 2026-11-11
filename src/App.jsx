@@ -1,9 +1,11 @@
 import useLocalStorageState from "./hooks/useLocalStorageState.jsx";
+import useTaskFilters from "./hooks/useTaskFilters.jsx"
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link } from "react-router";
 import TaskDetailPage from "./components/TaskDetailPage.jsx";
 import HomePage from "./components/HomePage.jsx";
 import NotFoundPage from "./components/NotFoundpage.jsx";
+import CompA from "./components/CompA.jsx";
 
 // Initial task data
 const sampleTasks = [
@@ -88,6 +90,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
+      <CompA />
     </>
   );
 }

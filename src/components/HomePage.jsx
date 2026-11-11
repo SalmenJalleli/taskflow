@@ -1,7 +1,9 @@
 import PageHeader from "./PageHeader.jsx";
 import SummaryCard from "./SummaryCard.jsx";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TaskList from "./TaskList.jsx";
+import useTaskFilters from "../hooks/useTaskFilters.jsx";
+import Panel from "./Panel.jsx";
 function HomePage({
   tasks,
   onToggle,
@@ -11,19 +13,14 @@ function HomePage({
   activeCount,
 }) {
   // CHILDREN / COMPOSITION
-  function Panel({ title, children }) {
-    return (
-      <section className="panel">
-        <h2>{title}</h2>
-        {children}
-      </section>
-    );
-  }
-
+  const { search, setSearch, status, setStatus, filteredTasks } =
+    useTaskFilters(tasks);
+  useEffect(() => {
+    console.log(search);
+  });
   // LOCAL STATE AND EVENT HANDLING
   function Counter() {
     const [count, setCount] = useState(0);
-
     return (
       <div>
         <p>Count: {count}</p>
@@ -108,9 +105,29 @@ function HomePage({
         activeCount={activeCount}
       />
       <Panel title="Your Tasks">
-        <TaskList tasks={tasks} onToggle={onToggle} onDelete={onDelete} />
+        <p>Search:</p>
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        ></input>
+        <TaskList
+          tasks={filteredTasks}
+          onToggle={onToggle}
+          onDelete={onDelete}
+        />
       </Panel>
       <TaskForm onAddTask={onAddTask} />
+      <p>Filters:</p>
+      <select
+        value={status}
+        onChange={(event) => setStatus(event.target.value)}
+      >
+        <option value="all">All tasks</option>
+        <option value="active">Active</option>
+        <option value="completed">Completed</option>
+      </select>
       <Counter />
     </main>
   );
