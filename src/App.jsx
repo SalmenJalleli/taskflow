@@ -7,6 +7,7 @@ import HomePage from "./components/HomePage.jsx";
 import NotFoundPage from "./components/NotFoundpage.jsx";
 import CompA from "./components/CompA.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
+import { useReducer } from "react";
 
 // Initial task data
 const sampleTasks = [
@@ -40,9 +41,32 @@ let taskToAdd = {
   priority: "medium",
   completed: false,
 };
+const ACTIONS = {
+  INCREMENT: "INCREMENT",
+  DECREMENT: "DECREMENT",
+};
+function reducer(state, action) {
+  switch (action.type) {
+    case ACTIONS.INCREMENT:
+      return { count: state.count + 1 };
+    case ACTIONS.DECREMENT:
+      return { count: state.count - 1 };
+    default:
+      state;
+  }
+  console.log(state);
+  return { count: state.count + 1 };
+}
 function App() {
   // STATE: App owns the tasks state
   const [tasks, setTasks] = useLocalStorageState("tasks", []);
+  const [state, dispatch] = useReducer(reducer, { count: 0 });
+  function increment() {
+    dispatch({ type: ACTIONS.INCREMENT });
+  }
+  function decrement() {
+    dispatch({ type: ACTIONS.DECREMENT });
+  }
   // Toggle task completion
   function toggleTask(id) {
     setTasks((currentTasks) =>
@@ -93,6 +117,9 @@ function App() {
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
+      <button onClick={increment}>increase</button>
+      <p>{state.count}</p>
+      <button onClick={decrement}>decrease</button>
       <CompA />
     </>
   );
