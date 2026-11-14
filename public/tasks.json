@@ -1,0 +1,9 @@
+[
+  {
+    "id": "remote-1",
+    "title": "Practice fetching tasks",
+    "description": "Load this task on the Remote tasks page.",
+    "priority": "medium",
+    "completed": false
+  }
+]

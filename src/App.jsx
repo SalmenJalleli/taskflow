@@ -8,6 +8,7 @@ import NotFoundPage from "./components/NotFoundpage.jsx";
 import CompA from "./components/CompA.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { useReducer } from "react";
+import RemoteTasksPage from "./components/RemoteTasksPage.jsx";
 
 // Initial task data
 const sampleTasks = [
@@ -113,6 +114,7 @@ function App() {
               path="/tasks/:taskId"
               element={<TaskDetailPage tasks={tasks} />}
             />
+            <Route path="/remote-tasks" element={<RemoteTasksPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
