@@ -87,6 +87,13 @@ function App() {
     setTasks((currentTasks) => [newTask, ...currentTasks]);
   }
 
+  function updateTask(taskId, changes) {
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === taskId ? { ...task, ...changes } : task,
+      ),
+    );
+  }
   // Derived state: calculate task statistics
   const completedTasksCount = tasks.filter((task) => task.completed).length;
 
@@ -112,7 +119,9 @@ function App() {
             />
             <Route
               path="/tasks/:taskId"
-              element={<TaskDetailPage tasks={tasks} />}
+              element={
+                <TaskDetailPage tasks={tasks} onUpdateTask={updateTask} />
+              }
             />
             <Route path="/remote-tasks" element={<RemoteTasksPage />} />
             <Route path="*" element={<NotFoundPage />} />
