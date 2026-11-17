@@ -3,6 +3,7 @@ import SummaryCard from "./SummaryCard.jsx";
 import { useEffect, useRef, useState } from "react";
 import TaskList from "./TaskList.jsx";
 import useTaskFilters from "../hooks/useTaskFilters.jsx";
+import KanbanBoard from "./KanbanBoard.jsx";
 import Panel from "./Panel.jsx";
 function HomePage({
   tasks,
@@ -11,10 +12,15 @@ function HomePage({
   onAddTask,
   completedTasksCount,
   activeCount,
+  onMoveTask
 }) {
   // CHILDREN / COMPOSITION
   const { search, setSearch, status, setStatus, filteredTasks } =
     useTaskFilters(tasks);
+  const boardTasks = tasks.map((task) => ({
+    ...task,
+    status: task.status ?? (task.completed ? "done" : "todo"),
+  }));
   useEffect(() => {
     console.log(search);
   });
@@ -112,6 +118,7 @@ function HomePage({
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         ></input>
+        <KanbanBoard tasks={boardTasks} onMoveTask={onMoveTask} />
         <TaskList
           tasks={filteredTasks}
           onToggle={onToggle}

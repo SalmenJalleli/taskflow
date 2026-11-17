@@ -94,6 +94,20 @@ function App() {
       ),
     );
   }
+
+  function moveTask(taskId, newStatus) {
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        String(task.id) === String(taskId)
+          ? {
+              ...task,
+              status: newStatus,
+              completed: newStatus === "done",
+            }
+          : task,
+      ),
+    );
+  }
   // Derived state: calculate task statistics
   const completedTasksCount = tasks.filter((task) => task.completed).length;
 
@@ -112,6 +126,7 @@ function App() {
                   onToggle={toggleTask}
                   onDelete={deleteTask}
                   onAddTask={addTask}
+                  onMoveTask={moveTask}
                   completedTasksCount={completedTasksCount}
                   activeCount={activeCount}
                 />
