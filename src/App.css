@@ -14,6 +14,11 @@
   min-width: 0;
 }
 
+.kanban-column.drag-over {
+  outline: 2px dashed #16a34a;
+  outline-offset: -2px;
+}
+
 .kanban-card {
   background: white;
   padding: 16px;

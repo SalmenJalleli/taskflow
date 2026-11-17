@@ -1,18 +1,32 @@
 //this component displays an individual task.
+//we can use for drag and drop events the useDraggable from @dnd-kit/core.
+import { useDraggable } from "@dnd-kit/core";
 
 function KanbanCard({ task }) {
-  function handleDragStart(event) {
-    console.log("dragging task:", task.id);
-    event.dataTransfer.setData("text/plain", String(task.id));
-    event.dataTransfer.effectAllowed = "move";
-  }
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+  } = useDraggable({
+    id: String(task.id),
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
   return (
-    <article className="kanban-card" draggable onDragStart={handleDragStart}>
+    <article
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+    >
       <h3>{task.title}</h3>
-      <p>{task.description}</p>
-      <small>Priority: {task.priority}</small>
     </article>
   );
 }
-
 export default KanbanCard;

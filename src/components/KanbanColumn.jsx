@@ -1,14 +1,17 @@
 //displays tasks belonging to a particular status.
 
 import KanbanCard from "./KanbanCard";
-
-function KanbanColumn({ title, status, tasks, onMoveTask }) {
+import { useDroppable } from "@dnd-kit/core";
+function KanbanColumn({ title, status, tasks }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: status,
+  });
   // 1. Filter tasks based on status
   const filteredTasks = tasks.filter((task) => {
     return task.status === status;
   });
   const count = filteredTasks.length;
-  function handleDragOver(event) {
+  /*function handleDragOver(event) {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }
@@ -17,12 +20,13 @@ function KanbanColumn({ title, status, tasks, onMoveTask }) {
     const taskId = event.dataTransfer.getData("text/plain");
     if (!taskId) return;
     onMoveTask(taskId, status);
-  }
+  }*/
   return (
     <section
-      className="kanban-column"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
+      className={`kanban-column ${isOver ? "drag-over" : ""}`}
+      //onDrop={handleDrop}
+      //onDragOver={handleDragOver}
+      ref={setNodeRef}
     >
       <h2>
         {title} ({count})
