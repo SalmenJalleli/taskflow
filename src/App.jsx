@@ -108,6 +108,10 @@ function App() {
       ),
     );
   }
+  //helper function to return reordered tasks
+  function reorderTasks(reorderedTasks) {
+    setTasks(reorderedTasks);
+  }
   // Derived state: calculate task statistics
   const completedTasksCount = tasks.filter((task) => task.completed).length;
 
@@ -127,6 +131,7 @@ function App() {
                   onDelete={deleteTask}
                   onAddTask={addTask}
                   onMoveTask={moveTask}
+                  onReorderTasks={reorderTasks}
                   completedTasksCount={completedTasksCount}
                   activeCount={activeCount}
                 />
@@ -143,10 +148,6 @@ function App() {
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
-      <button onClick={increment}>increase</button>
-      <p>{state.count}</p>
-      <button onClick={decrement}>decrease</button>
-      <CompA />
     </>
   );
 }

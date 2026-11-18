@@ -2,6 +2,7 @@
 
 import KanbanCard from "./KanbanCard";
 import { useDroppable } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
 function KanbanColumn({ title, status, tasks }) {
   const { setNodeRef, isOver } = useDroppable({
     id: status,
@@ -31,11 +32,13 @@ function KanbanColumn({ title, status, tasks }) {
       <h2>
         {title} ({count})
       </h2>
-      {count === 0 ? (
-        <p>No Tasks</p>
-      ) : (
-        filteredTasks.map((task) => <KanbanCard key={task.id} task={task} />)
-      )}
+      <SortableContext items={filteredTasks.map((task) => String(task.id))}>
+        {count === 0 ? (
+          <p>No Tasks</p>
+        ) : (
+          filteredTasks.map((task) => <KanbanCard key={task.id} task={task} />)
+        )}
+      </SortableContext>
     </section>
   );
 }

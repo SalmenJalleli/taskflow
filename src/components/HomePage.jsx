@@ -12,7 +12,8 @@ function HomePage({
   onAddTask,
   completedTasksCount,
   activeCount,
-  onMoveTask
+  onMoveTask,
+  onReorderTasks
 }) {
   // CHILDREN / COMPOSITION
   const { search, setSearch, status, setStatus, filteredTasks } =
@@ -118,7 +119,7 @@ function HomePage({
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         ></input>
-        <KanbanBoard tasks={boardTasks} onMoveTask={onMoveTask} />
+        <KanbanBoard tasks={boardTasks} onMoveTask={onMoveTask} onReorderTasks={onReorderTasks} />
         <TaskList
           tasks={filteredTasks}
           onToggle={onToggle}
