@@ -4,9 +4,7 @@ function TaskCard({ task, onToggleComplete, onDeleteTask }) {
   return (
     <article className="task-card">
       <h2>
-        <Link to={`/tasks/${task.id}`}>
-          {task.title}
-        </Link>
+        <Link to={`/tasks/${task.id}`}>{task.title}</Link>
       </h2>
 
       <p>{task.description}</p>
@@ -14,7 +12,10 @@ function TaskCard({ task, onToggleComplete, onDeleteTask }) {
       <small>Priority: {task.priority}</small>
 
       <p>Status: {task.completed ? "Completed" : "Active"}</p>
-
+      <p>
+        <strong>Status:</strong>
+        {task.status ?? "todo"}
+      </p>
       <button type="button" onClick={() => onToggleComplete(task.id)}>
         {task.completed ? "Mark Incomplete" : "Mark Complete"}
       </button>

@@ -71,9 +71,19 @@ function App() {
   // Toggle task completion
   function toggleTask(id) {
     setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task,
-      ),
+      currentTasks.map((task) => {
+        if (String(task.id) !== String(id)) {
+          return task;
+        }
+
+        const newCompleted = !task.completed;
+
+        return {
+          ...task,
+          completed: newCompleted,
+          status: newCompleted ? "done" : "todo",
+        };
+      }),
     );
   }
 

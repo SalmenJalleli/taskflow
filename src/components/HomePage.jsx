@@ -73,6 +73,7 @@ function HomePage({
         priority,
         completed: false,
         createdAt: new Date().toISOString(),
+        status: "todo"
       });
       setTitle("");
       setPriority("medium");

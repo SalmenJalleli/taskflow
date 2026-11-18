@@ -3,6 +3,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Link } from "react-router";
 
 function KanbanCard({ task }) {
   const {
@@ -12,6 +13,7 @@ function KanbanCard({ task }) {
     transform,
     transition,
     isDragging,
+    setActivatorNodeRef,
   } = useSortable({
     id: String(task.id),
   });
@@ -23,14 +25,19 @@ function KanbanCard({ task }) {
   };
 
   return (
-    <article
-      className="kanban-card"
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-    >
-      <h3>{task.title}</h3>
+    <article className="kanban-card" ref={setNodeRef} style={style}>
+      <button
+        type="button"
+        {...listeners}
+        {...attributes}
+        ref={setActivatorNodeRef}
+        aria-label={`Drag ${task.title}`}
+      >
+        ⠿
+      </button>
+      <Link to={`/tasks/${task.id}`} className="kanban-card-link">
+        <h3>{task.title}</h3>
+      </Link>
     </article>
   );
 }
