@@ -5,6 +5,8 @@ import TaskList from "./TaskList.jsx";
 import useTaskFilters from "../hooks/useTaskFilters.jsx";
 import KanbanBoard from "./KanbanBoard.jsx";
 import Panel from "./Panel.jsx";
+import TaskForm from "./TaskForm.jsx";
+import FilterBar from "./FilterBar.jsx";
 function HomePage({
   tasks,
   onToggle,
@@ -13,7 +15,7 @@ function HomePage({
   completedTasksCount,
   activeCount,
   onMoveTask,
-  onReorderTasks
+  onReorderTasks,
 }) {
   // CHILDREN / COMPOSITION
   const { search, setSearch, status, setStatus, filteredTasks } =
@@ -50,61 +52,6 @@ function HomePage({
       </div>
     );
   }
-
-  function TaskForm({ onAddTask }) {
-    const [title, setTitle] = useState("");
-    const [priority, setPriority] = useState("medium");
-    const [error, setError] = useState("");
-    function handleSubmit(e) {
-      e.preventDefault();
-      if (!title) {
-        setError("Title is required");
-        return;
-      }
-      const cleanTitle = title.trim();
-      if (!cleanTitle) {
-        setError("Title cannot be empty");
-        return;
-      }
-      onAddTask({
-        id: crypto.randomUUID(),
-        title: cleanTitle,
-        description: "",
-        priority,
-        completed: false,
-        createdAt: new Date().toISOString(),
-        status: "todo"
-      });
-      setTitle("");
-      setPriority("medium");
-      setError("");
-    }
-
-    return (
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="title">Title:</label>
-        <input
-          type="text"
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          maxLength={80}
-        />
-        <label htmlFor="priority">Priority:</label>
-        <select
-          id="priority"
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-        >
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-        </select>
-        {error && <p role="alert">{error}</p>}
-        <button type="submit">Add Task</button>
-      </form>
-    );
-  }
   return (
     <main>
       <PageHeader />
@@ -113,31 +60,27 @@ function HomePage({
         activeCount={activeCount}
       />
       <Panel title="Your Tasks">
-        <p>Search:</p>
-        <input
-          type="text"
-          placeholder="Search tasks..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        ></input>
-        <KanbanBoard tasks={boardTasks} onMoveTask={onMoveTask} onReorderTasks={onReorderTasks} />
-        <TaskList
-          tasks={filteredTasks}
-          onToggle={onToggle}
-          onDelete={onDelete}
+        <KanbanBoard
+          tasks={boardTasks}
+          onMoveTask={onMoveTask}
+          onReorderTasks={onReorderTasks}
         />
+        <TaskForm onAddTask={onAddTask} />
+        <div className="task-list-section">
+          <FilterBar
+            search={search}
+            onSearchChange={setSearch}
+            status={status}
+            onStatusChange={setStatus}
+          />
+          <TaskList className="task-list"
+            tasks={filteredTasks}
+            onToggle={onToggle}
+            onDelete={onDelete}
+          />
+        </div>
       </Panel>
-      <TaskForm onAddTask={onAddTask} />
-      <p>Filters:</p>
-      <select
-        value={status}
-        onChange={(event) => setStatus(event.target.value)}
-      >
-        <option value="all">All tasks</option>
-        <option value="active">Active</option>
-        <option value="completed">Completed</option>
-      </select>
-      <Counter />
+      {/*<Counter />*/}
     </main>
   );
 }
