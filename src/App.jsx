@@ -6,6 +6,7 @@ import NotFoundPage from "./components/NotFoundpage.jsx";
 import RemoteTasksPage from "./components/RemoteTasksPage.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import "./App.css";
+import { useReducer, useEffect } from "react";
 
 function toTaskArray(value) {
   if (Array.isArray(value)) {
@@ -24,10 +25,73 @@ function toTaskArray(value) {
 
 function App() {
   const [storedTasks, setStoredTasks] = useLocalStorageState("tasks", []);
-  const tasks = toTaskArray(storedTasks);
 
+  const [{ tasks, lastDeleted }, dispatch] = useReducer(
+    taskReducer,
+    storedTasks,
+    (initialValue) => ({
+      tasks: toTaskArray(initialValue),
+      lastDeleted: null,
+    }),
+  );
+
+  useEffect(() => {
+    setStoredTasks(tasks);
+  }, [tasks, setStoredTasks]);
+
+  useEffect(() => {
+    if (lastDeleted) {
+      console.log("Deleted task:", lastDeleted.task);
+      console.log("Original index:", lastDeleted.index);
+    }
+  }, [lastDeleted]);
+
+  function taskReducer(state, action) {
+    switch (action.type) {
+      case "UPDATE_TASKS":
+        return {
+          ...state,
+          tasks: action.update(state.tasks),
+        };
+
+      case "DELETE_TASK": {
+        const index = state.tasks.findIndex(
+          (task) => String(task.id) === String(action.id),
+        );
+
+        if (index === -1) return state;
+
+        return {
+          ...state,
+          tasks: state.tasks.filter(
+            (task) => String(task.id) !== String(action.id),
+          ),
+          lastDeleted: {
+            task: state.tasks[index],
+            index,
+          },
+        };
+      }
+      case "UNDO_DELETE": {
+        if (!state.lastDeleted) return state;
+
+        const { task, index } = state.lastDeleted;
+        const tasks = [...state.tasks];
+
+        tasks.splice(index, 0, task);
+
+        return {
+          ...state,
+          tasks,
+          lastDeleted: null,
+        };
+      }
+      default:
+        return state;
+    }
+  }
   function setTasks(update) {
-    setStoredTasks((currentValue) => update(toTaskArray(currentValue)));
+    dispatch({ type: "UPDATE_TASKS", update });
   }
 
   function toggleTask(id) {
@@ -49,9 +113,14 @@ function App() {
   }
 
   function deleteTask(id) {
-    setTasks((currentTasks) =>
-      currentTasks.filter((task) => String(task.id) !== String(id)),
-    );
+    dispatch({ type: "DELETE_TASK", id });
+    console.log(lastDeleted);
+  }
+
+  function reorderTasks(reorderedTasks) {
+    if (Array.isArray(reorderedTasks)) {
+      setTasks(() => reorderedTasks);
+    }
   }
 
   function addTask(newTask) {
@@ -80,12 +149,6 @@ function App() {
     );
   }
 
-  function reorderTasks(reorderedTasks) {
-    if (Array.isArray(reorderedTasks)) {
-      setStoredTasks(reorderedTasks);
-    }
-  }
-
   const completedTasksCount = tasks.filter((task) => task.completed).length;
   const activeCount = tasks.length - completedTasksCount;
 
@@ -96,23 +159,37 @@ function App() {
           <Route
             path="/"
             element={
-              <HomePage
-                tasks={tasks}
-                onToggle={toggleTask}
-                onDelete={deleteTask}
-                onAddTask={addTask}
-                onMoveTask={moveTask}
-                onReorderTasks={reorderTasks}
-                completedTasksCount={completedTasksCount}
-                activeCount={activeCount}
-              />
+              <>
+                {lastDeleted && (
+                  <div className="alert alert-info d-flex align-items-center gap-2">
+                    <span role="status">
+                      Deleted “{lastDeleted.task.title}”.
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => dispatch({ type: "UNDO_DELETE" })}
+                    >
+                      Undo
+                    </button>
+                  </div>
+                )}
+                <HomePage
+                  tasks={tasks}
+                  onToggle={toggleTask}
+                  onDelete={deleteTask}
+                  onAddTask={addTask}
+                  onMoveTask={moveTask}
+                  onReorderTasks={reorderTasks}
+                  completedTasksCount={completedTasksCount}
+                  activeCount={activeCount}
+                />
+              </>
             }
           />
           <Route
             path="/tasks/:taskId"
-            element={
-              <TaskDetailPage tasks={tasks} onUpdateTask={updateTask} />
-            }
+            element={<TaskDetailPage tasks={tasks} onUpdateTask={updateTask} />}
           />
           <Route path="/remote-tasks" element={<RemoteTasksPage />} />
           <Route path="*" element={<NotFoundPage />} />
