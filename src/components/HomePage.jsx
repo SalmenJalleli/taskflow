@@ -23,6 +23,7 @@ function HomePage({
   const boardTasks = tasks.map((task) => ({
     ...task,
     status: task.status ?? (task.completed ? "done" : "todo"),
+    dueDate: new Date()
   }));
   useEffect(() => {
     console.log(search);

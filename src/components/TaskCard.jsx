@@ -13,9 +13,19 @@ function TaskCard({ task, onToggleComplete, onDeleteTask }) {
 
       <p>Status: {task.completed ? "Completed" : "Active"}</p>
       <p>
-        <strong>Status:</strong>
+        <strong>Status: </strong>
         {task.status ?? "todo"}
       </p>
+      {task.dueDate && (
+        <p>
+          Due date:{" "}
+          {new Date(task.dueDate).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
+        </p>
+      )}
       <div className="task-actions">
         <button
           className="task-action"

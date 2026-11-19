@@ -3,6 +3,7 @@ import { useState } from "react";
 function TaskForm({ onAddTask }) {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("medium");
+  const [dueDate, setdueDate] = useState("");
   const [error, setError] = useState("");
 
   function handleSubmit(event) {
@@ -22,11 +23,13 @@ function TaskForm({ onAddTask }) {
       completed: false,
       createdAt: new Date().toISOString(),
       status: "todo",
+      dueDate: dueDate || null,
     });
 
     setTitle("");
     setPriority("medium");
     setError("");
+    setdueDate("");
   }
 
   return (
@@ -50,7 +53,13 @@ function TaskForm({ onAddTask }) {
         <option value="medium">Medium</option>
         <option value="low">Low</option>
       </select>
-
+      <label htmlFor="due-date">Due date (optional):</label>
+      <input
+        type="date"
+        id="due-date"
+        value={dueDate}
+        onChange={(event) => setdueDate(event.target.value)}
+      />
       {error && <p role="alert">{error}</p>}
 
       <button type="submit">Add Task</button>
