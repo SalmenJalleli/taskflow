@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isTaskOverdue } from "../utils/taskDates";
 
 function useTaskFilters(tasks) {
   const [search, setSearch] = useState("");
@@ -8,7 +9,8 @@ function useTaskFilters(tasks) {
     const matchesStatus =
       status === "all" ||
       (status === "active" && !task.completed) ||
-      (status === "completed" && task.completed);
+      (status === "completed" && task.completed) ||
+      (status === "overdue" && isTaskOverdue(task));
     return matchesText && matchesStatus;
   });
   return {

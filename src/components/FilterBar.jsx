@@ -19,6 +19,7 @@ function FilterBar({ search, onSearchChange, status, onStatusChange }) {
         <option value="all">All tasks</option>
         <option value="active">Active</option>
         <option value="completed">Completed</option>
+        <option value="overdue">Overdue</option>
       </select>
     </div>
   );

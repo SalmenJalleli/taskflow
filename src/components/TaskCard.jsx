@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { isTaskOverdue } from "../utils/taskDates";
 // INDIVIDUAL TASK COMPONENT
 function TaskCard({ task, onToggleComplete, onDeleteTask }) {
   return (
@@ -25,6 +26,9 @@ function TaskCard({ task, onToggleComplete, onDeleteTask }) {
             year: "numeric",
           })}
         </p>
+      )}
+      {isTaskOverdue(task) && (
+        <span className="badge text-bg-danger">Overdue</span>
       )}
       <div className="task-actions">
         <button

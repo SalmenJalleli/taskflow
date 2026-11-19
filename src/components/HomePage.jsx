@@ -22,8 +22,7 @@ function HomePage({
     useTaskFilters(tasks);
   const boardTasks = tasks.map((task) => ({
     ...task,
-    status: task.status ?? (task.completed ? "done" : "todo"),
-    dueDate: new Date()
+    status: task.status ?? (task.completed ? "done" : "todo")
   }));
   useEffect(() => {
     console.log(search);
