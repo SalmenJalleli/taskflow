@@ -34,7 +34,13 @@ function App() {
       lastDeleted: null,
     }),
   );
-
+  useEffect(() => {
+    if (!lastDeleted) return;
+    const timeoutId = setTimeout(() => {
+      dispatch({ type: "DISMISS_UNDO" });
+    }, 5000);
+    return () => clearTimeout(timeoutId);
+  }, [lastDeleted, dispatch]);
   useEffect(() => {
     setStoredTasks(tasks);
   }, [tasks, setStoredTasks]);
@@ -86,6 +92,11 @@ function App() {
           lastDeleted: null,
         };
       }
+      case "DISMISS_UNDO":
+        return {
+          ...state,
+          lastDeleted: null,
+        };
       default:
         return state;
     }
@@ -148,6 +159,9 @@ function App() {
       ),
     );
   }
+  function onUndo() {
+    dispatch({ type: "UNDO_DELETE" });
+  }
 
   const completedTasksCount = tasks.filter((task) => task.completed).length;
   const activeCount = tasks.length - completedTasksCount;
@@ -168,7 +182,7 @@ function App() {
                     <button
                       type="button"
                       className="btn btn-sm btn-outline-primary"
-                      onClick={() => dispatch({ type: "UNDO_DELETE" })}
+                      onClick={onUndo}
                     >
                       Undo
                     </button>
