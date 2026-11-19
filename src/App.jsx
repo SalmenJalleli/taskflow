@@ -1,88 +1,59 @@
+import { BrowserRouter, Routes, Route } from "react-router";
 import useLocalStorageState from "./hooks/useLocalStorageState.jsx";
-import useTaskFilters from "./hooks/useTaskFilters.jsx";
-import "./App.css";
-import { BrowserRouter, Routes, Route, Link } from "react-router";
-import TaskDetailPage from "./components/TaskDetailPage.jsx";
 import HomePage from "./components/HomePage.jsx";
+import TaskDetailPage from "./components/TaskDetailPage.jsx";
 import NotFoundPage from "./components/NotFoundpage.jsx";
-import CompA from "./components/CompA.jsx";
-import { ThemeProvider } from "./context/ThemeContext.jsx";
-import { useReducer } from "react";
 import RemoteTasksPage from "./components/RemoteTasksPage.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
+import "./App.css";
 
-// Initial task data
-const sampleTasks = [
-  {
-    id: 1,
-    title: "Learn JSX",
-    description: "Build the first screen",
-    priority: "high",
-    completed: false,
-  },
-  {
-    id: 2,
-    title: "Create components",
-    description: "Split the UI",
-    priority: "medium",
-    completed: false,
-  },
-  {
-    id: 3,
-    title: "Style the app",
-    description: "Add spacing and colour",
-    priority: "low",
-    completed: true,
-  },
-];
-//Task to add
-let taskToAdd = {
-  id: 4,
-  title: "Add a new task",
-  description: "Implement the add task feature",
-  priority: "medium",
-  completed: false,
-};
-const ACTIONS = {
-  INCREMENT: "INCREMENT",
-  DECREMENT: "DECREMENT",
-};
-function reducer(state, action) {
-  switch (action.type) {
-    case ACTIONS.INCREMENT:
-      return { count: state.count + 1 };
-    case ACTIONS.DECREMENT:
-      return { count: state.count - 1 };
-    default:
-      state;
+function toTaskArray(value) {
+  if (Array.isArray(value)) {
+    return value;
   }
-  console.log(state);
-  return { count: state.count + 1 };
+
+  const ids = value?.allIds ?? value?.ids;
+  const tasksById = value?.byId ?? value?.entities;
+
+  if (Array.isArray(ids) && tasksById) {
+    return ids.map((id) => tasksById[id]).filter(Boolean);
+  }
+
+  return [];
 }
+
 function App() {
-  // STATE: App owns the tasks state
-  const [tasks, setTasks] = useLocalStorageState("tasks", []);
-  const [state, dispatch] = useReducer(reducer, { count: 0 });
-  function increment() {
-    dispatch({ type: ACTIONS.INCREMENT });
+  const [storedTasks, setStoredTasks] = useLocalStorageState("tasks", []);
+  const tasks = toTaskArray(storedTasks);
+
+  function setTasks(update) {
+    setStoredTasks((currentValue) => update(toTaskArray(currentValue)));
   }
-  function decrement() {
-    dispatch({ type: ACTIONS.DECREMENT });
-  }
-  // Toggle task completion
+
   function toggleTask(id) {
     setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task,
-      ),
+      currentTasks.map((task) => {
+        if (String(task.id) !== String(id)) {
+          return task;
+        }
+
+        const completed = !task.completed;
+
+        return {
+          ...task,
+          completed,
+          status: completed ? "done" : "todo",
+        };
+      }),
     );
   }
 
-  // Delete a task
   function deleteTask(id) {
-    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
+    setTasks((currentTasks) =>
+      currentTasks.filter((task) => String(task.id) !== String(id)),
+    );
   }
 
-  // Add a new task
   function addTask(newTask) {
     setTasks((currentTasks) => [newTask, ...currentTasks]);
   }
@@ -90,7 +61,7 @@ function App() {
   function updateTask(taskId, changes) {
     setTasks((currentTasks) =>
       currentTasks.map((task) =>
-        task.id === taskId ? { ...task, ...changes } : task,
+        String(task.id) === String(taskId) ? { ...task, ...changes } : task,
       ),
     );
   }
@@ -108,46 +79,47 @@ function App() {
       ),
     );
   }
-  // Derived state: calculate task statistics
-  const completedTasksCount = tasks.filter((task) => task.completed).length;
 
-  const activeCount = tasks.filter((task) => !task.completed).length;
+  function reorderTasks(reorderedTasks) {
+    if (Array.isArray(reorderedTasks)) {
+      setStoredTasks(reorderedTasks);
+    }
+  }
+
+  const completedTasksCount = tasks.filter((task) => task.completed).length;
+  const activeCount = tasks.length - completedTasksCount;
 
   return (
-    <>
-      <ThemeProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <HomePage
-                  tasks={tasks}
-                  onToggle={toggleTask}
-                  onDelete={deleteTask}
-                  onAddTask={addTask}
-                  onMoveTask={moveTask}
-                  completedTasksCount={completedTasksCount}
-                  activeCount={activeCount}
-                />
-              }
-            />
-            <Route
-              path="/tasks/:taskId"
-              element={
-                <TaskDetailPage tasks={tasks} onUpdateTask={updateTask} />
-              }
-            />
-            <Route path="/remote-tasks" element={<RemoteTasksPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-      <button onClick={increment}>increase</button>
-      <p>{state.count}</p>
-      <button onClick={decrement}>decrease</button>
-      <CompA />
-    </>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                tasks={tasks}
+                onToggle={toggleTask}
+                onDelete={deleteTask}
+                onAddTask={addTask}
+                onMoveTask={moveTask}
+                onReorderTasks={reorderTasks}
+                completedTasksCount={completedTasksCount}
+                activeCount={activeCount}
+              />
+            }
+          />
+          <Route
+            path="/tasks/:taskId"
+            element={
+              <TaskDetailPage tasks={tasks} onUpdateTask={updateTask} />
+            }
+          />
+          <Route path="/remote-tasks" element={<RemoteTasksPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
+
 export default App;
